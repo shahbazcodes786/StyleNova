@@ -12,6 +12,8 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
 
+from carts.views import _cart_id, Cart, CartItem
+
 # Create your views here.
 
 
@@ -61,6 +63,44 @@ def login(request):
         user = auth.authenticate(email=email, password=password)
 
         if user is not None:
+            try:
+                cart = Cart.objects.get(cart_id=_cart_id(request))
+                guest_items = CartItem.objects.filter(cart=cart)
+
+                for item in guest_items:
+                    #guest item ke variations nikal kar un ko sort karo id se 
+                    guest_variations = list(item.variations.all().order_by('id'))
+
+                    #user ke cart ka items nikalo 
+                    user_cart_items = CartItem.objects.filter(user=user, product=item.product)
+
+                    matched_item = None
+
+                    #user ke items ke variations nikalo
+                    for u_item in user_cart_items:
+                        user_variations = list(u_item.variations.all().order_by('id'))
+                        
+                        # Agar exact saari variations match ho jayein
+                        if user_variations == guest_variations:
+                            matched_item = u_item
+                            break  # Match mil gaya, loop rokh do
+
+                    # 4. Final Logic: Quantity barhao ya user assign karo
+                    if matched_item:
+                        #ager same variations mil jayan kasi bhe product ke to bas us product ke qountity barah do
+                        matched_item.quantity += item.quantity
+                        matched_item.save()
+                        item.delete()
+                    else:
+                        item.user = user
+                        item.cart = None
+                        item.save()
+
+            except Cart.DoesNotExist:
+                pass
+
+
+
             auth.login(request, user)
             messages.success(request, 'You are now Logged in.')
             return redirect('dashboard')

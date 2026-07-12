@@ -5,3 +5,4 @@ venv/
 myvenv/
 media/
 db.sqlite3
+templates\rough
