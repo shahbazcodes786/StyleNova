@@ -201,10 +201,11 @@ def cart(request, total=0, quantity=0, cart_item=None, cart_items=None):
 
 
 @login_required(login_url='login')
-def checkout(request, total=0, quantity=0, cart_item=None):
+def checkout(request, total=0, quantity=0, cart_items=None):
     try:
         tax = 0
         grand_total = 0
+        cart_items = []
         cart = Cart.objects.get(cart_id=_cart_id(request))
         cart_items = CartItem.objects.filter(cart=cart, is_active=True)
         for cart_item in cart_items:
