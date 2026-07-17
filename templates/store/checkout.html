@@ -66,13 +66,42 @@
                             <label for="">Order Note</label>
                             <textarea rows="2" class="form-control" name="order_note"></textarea>
                     </div>
-
-    
-                    
                 
             </div>
+            
+            <div class="card-body">
+                <h4 class="card-title mb-4">Select Payment Method</h4>
+
+                {% for payment in payment_methods %}
+                <div class="payment-card" style="border:1px solid #ddd; border-radius:10px; padding:12px 15px; margin-bottom:15px;">
+
+                    <input
+                        class="payment-radio"
+                        type="radio"
+                        name="payment_method"
+                        id="payment{{ payment.id }}"
+                        value="{{ payment.id }}"
+                        required style="margin-right:12px;"
+                    >
+
+                    <label class="payment-label" for="payment{{ payment.id }}" style="display:flex; align-items:center;
+                     gap:15px; cursor:pointer; width:100%; margin:0;">
+                        {% if payment.method_logo %}
+                            <img src="{{ payment.method_logo.url }}" class="payment-logo" style="width:60px;height:60px;object-fit:contain;" alt="{{ payment.method }}">
+                        {% endif %}
+
+                        <strong>{{ payment.method }}</strong>
+                    </label>
+
+                </div>
+                {% endfor %}
+
+            </div>
+
 
         </div> <!-- card.// -->
+
+        
 
             </aside> <!-- col.// -->
             <aside class="col-lg-6">
@@ -115,8 +144,8 @@
                             </td>
                             <td> 
                                 <div class="price-wrap"> 
-                                    <var class="price">$ {{ cart_item.sub_total }}</var> 
-                                    <small class="text-muted"> $ {{ cart_item.product.price }} each </small> 
+                                    <var class="price">Rs {{ cart_item.sub_total }}</var> 
+                                    <small class="text-muted"> Rs {{ cart_item.product.price }} each </small> 
                                 </div> <!-- price-wrap .// -->
                             </td>
                        

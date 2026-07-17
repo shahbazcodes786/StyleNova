@@ -6,17 +6,26 @@ from store.models import Product, Variation
 #in payment model we only store the information about payment
 class Payment(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
-    payment_id = models.CharField(max_length=100)
-    payment_method = models.CharField(max_length=100)
+    payment_id = models.CharField(max_length=100, blank=True)
+    payment_method = models.ForeignKey('PaymentMethod', on_delete=models.SET_NULL, null=True, blank=True)
     amount_paid = models.CharField(max_length=100)
-    status = models.CharField(max_length=100)
+    transaction_id = models.CharField(max_length=100)
+    payment_screenshot = models.ImageField(upload_to='payment_screenshots/' )
+    status = models.CharField(max_length=20,
+        choices=(
+            ('Pending', 'Pending'),
+            ('Verified', 'Verified'),
+            ('Rejected', 'Rejected'),
+        ),
+        default='Pending')
     created_at = models.DateTimeField(auto_now_add=True)
     
     
-    def __str__(self):
-        return self.payment_id
     
-
+    def __str__(self):
+        return self.transaction_id
+    
+    
 #in Order model we store the information about the customer
 class Order(models.Model):
     STATUS = (
@@ -44,6 +53,7 @@ class Order(models.Model):
     tax = models.FloatField()
     status = models.CharField(max_length=50, choices=STATUS, default='New')
     ip = models.CharField(max_length=50, blank=True)
+    payment_method = models.ForeignKey("PaymentMethod", on_delete=models.SET_NULL, blank=True, null=True)
     is_ordered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -82,3 +92,21 @@ class OrderProduct(models.Model):
         return self.product.product_name
     
 
+class PaymentMethod(models.Model):
+    method = models.CharField(max_length=100, unique=True, help_text="Enter the name of the payment method (e.g., JazzCash)")
+    method_logo = models.ImageField(upload_to='payment_methods/logos/', blank=True, null=True)
+    display_order = models.PositiveIntegerField(default=0)
+    account_name = models.CharField(max_length=150)
+    account_number = models.CharField(max_length=150)
+    account_qr_code = models.ImageField(upload_to='payment_methods/qr_codes/', blank=True, null=True)
+    instructions = models.TextField(blank=True, help_text="Enter any specific instructions for this payment method.")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+    
+    
+    def __str__(self):
+        return self.method
+    
+    class Meta:
+        ordering = ['display_order']

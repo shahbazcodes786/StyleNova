@@ -23,7 +23,7 @@ $(document).ready(function() {
         var check_attr_name = $(this).attr('name');
         if ($(this).is(':checked')) {
             $('input[name='+ check_attr_name +']').closest('.js-check').removeClass('active');
-            $(this).closest('.js-check').addClass('active');
+            (this).closest('.js-check').addClass('active');
            // item.find('.radio').find('span').text('Add');
 
         } else {

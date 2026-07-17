@@ -3,6 +3,7 @@ from store.models import Product, Variation
 from carts.models import Cart, CartItem
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
+from orders.models import PaymentMethod
 
 # Create your views here.
 
@@ -215,6 +216,8 @@ def checkout(request, total=0, quantity=0, cart_items=None):
             quantity += cart_item.quantity
         tax = (2 * total)/100
         grand_total = total + tax
+        
+        payment_methods = PaymentMethod.objects.filter(is_active=True)  
     
     except ObjectDoesNotExist:
         pass # just ignore
@@ -225,7 +228,7 @@ def checkout(request, total=0, quantity=0, cart_items=None):
         'cart_items': cart_items,
         'tax'       : tax,
         'grand_total': grand_total,
-
+        'payment_methods': payment_methods,
     }
     
     return render(request, 'store/checkout.html', context)

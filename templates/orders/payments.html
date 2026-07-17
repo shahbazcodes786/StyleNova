@@ -32,7 +32,7 @@
                 <div class="card">
                     <h5 class="card-header">Payment Method </h5>
                     <div class="card-body">
-                        <p class="card-text">JazzCash</p>
+                        {{payment_method.method}}
                     </div>
                 </div> <!-- card.// -->
 
@@ -74,8 +74,8 @@
                                 </td>
                                 <td> 
                                     <div class="price-wrap"> 
-                                        <var class="price">$ {{ cart_item.sub_total }}</var> 
-                                        <small class="text-muted"> $ {{ cart_item.product.price }} each </small> 
+                                        <var class="price">Rs {{ cart_item.sub_total }}</var> 
+                                        <small class="text-muted"> Rs {{ cart_item.product.price }} each </small> 
                                     </div> <!-- price-wrap .// -->
                                 </td>
                            
@@ -94,20 +94,100 @@
                 <div class="card-body">
                     <dl class="dlist-align">
                       <dt>Total price:</dt>
-                      <dd class="text-right">$ {{ total }}</dd>
+                      <dd class="text-right">Rs {{ total }}</dd>
                     </dl>
                     <dl class="dlist-align">
                       <dt>Tax:</dt>
-                      <dd class="text-right"> $ {{ tax }}</dd>
+                      <dd class="text-right"> Rs {{ tax }}</dd>
                     </dl>
                     <dl class="dlist-align">
                       <dt>Total:</dt>
-                      <dd class="text-right text-dark b"><strong>$ {{ grand_total }}</strong></dd>
+                      <dd class="text-right text-dark b"><strong>Rs {{ grand_total }}</strong></dd>
                     </dl>
                     <hr>
-                    <p class="text-center mb-3">
-                        <img src="{% static './images/misc/payments.png' %}" height="26">
-                    </p>
+                   <div class="card mt-4" style="border:1px solid #ddd;border-radius:12px;">
+
+
+    <div class="card-body">
+
+        <h4 class="mb-4 text-center">Payment Details</h4>
+
+        <div style="background:#f8f9fa; border:2px solid #28a745; border-radius:10px; padding:15px; text-align:center; margin-bottom:20px;">
+
+    <h5 style="margin-bottom:10px;">
+        💳 Amount to Pay
+    </h5>
+
+    <h2 style="color:#28a745; margin:0;">
+        Rs. {{ grand_total }}
+    </h2>
+
+    <small style="color:#666;">
+        Please transfer the exact amount shown above.
+    </small>
+
+</div>
+
+        <div style="text-align:center; margin-bottom:20px;">
+            <img src="{{ payment_method.method_logo.url }}"
+                 alt="{{ payment_method.method }}"
+                 style="width:70px;height:70px;object-fit:contain;">
+            <h5 style="margin-top:10px;">{{ payment_method.method }}</h5>
+        </div>
+
+        <div style="text-align:center;margin-bottom:20px;">
+            <img src="{{ payment_method.account_qr_code.url }}"
+                 alt="QR Code"
+                 style="width:220px;height:220px;border:1px solid #ddd;padding:10px;border-radius:10px;">
+        </div>
+
+        <table class="table table-bordered">
+            <tr>
+                <th width="35%">Account Name</th>
+                <td>{{ payment_method.account_name }}</td>
+            </tr>
+
+            <tr>
+                <th>Account Number</th>
+                <td>
+                    <strong>{{ payment_method.account_number }}</strong>
+                </td>
+            </tr>
+        </table>
+
+                            {% if payment_method.instructions %}
+                            <div class="alert alert-info">
+                                {{ payment_method.instructions }}
+                            </div>
+                            {% endif %}
+
+                            <div class="alert alert-warning" style="border-left:5px solid #ffc107;">
+                                <strong>⚠ Important</strong>
+
+                                <ul style="margin-top:10px;margin-bottom:0;">
+                                    <li>Scan the QR Code or send payment to the account above.</li>
+                                    <li>Please pay exactly <strong>Rs. {{ grand_total }}</strong>.</li>
+                                    <li>Keep the payment screenshot for verification.</li>
+                                    <li>After payment, enter your Transaction ID.</li>
+                                    <li>Upload a clear payment screenshot.</li>
+                                    <li><strong>Without Transaction ID and Screenshot your order will not be verified.</strong></li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="form-group mt-4">
+                        <label><strong>Transaction ID <span style="color:red;">*</span></strong></label>
+                        <input type="text" class="form-control" name="transaction_id" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label><strong>Payment Screenshot <span style="color:red;">*</span></strong></label>
+                        <input type="file" class="form-control" name="payment_screenshot" accept="image/*" required>
+                    </div>
+
                     <a href="{% url 'checkout' %}" class="btn btn-primary btn-block"> Make Payment </a>
                 </div> <!-- card-body.// -->
                 </div> <!-- card.// -->

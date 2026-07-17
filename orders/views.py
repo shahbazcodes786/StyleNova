@@ -3,13 +3,20 @@ from django.http import HttpResponse
 from carts.models import CartItem
 from .forms import OrderForm
 import datetime
-from .models import Order
+from .models import Order, PaymentMethod
 
 
 # Create your views here.
 
 def payments(request):
-    return render(request, 'orders/payments.html')
+    payment_method_id = request.POST.get('payment_method')
+    
+    payment_method = PaymentMethod.objects.get(id=payment_method_id)
+    
+    context = {
+        'payment_method': payment_method,
+    }
+    return render(request, 'orders/payments.html', context)
 
 
 def place_order(request, total=0, quantity=0):
@@ -33,6 +40,8 @@ def place_order(request, total=0, quantity=0):
         if request.method == 'POST':
             form = OrderForm(request.POST)
             if form.is_valid():
+                payment_method_id = request.POST.get('payment_method')
+                payment_method = PaymentMethod.objects.get(id=payment_method_id)
                 #store all billing information inside Order table
                 data = Order()
                 data.user = current_user
@@ -49,6 +58,7 @@ def place_order(request, total=0, quantity=0):
                 data.order_total = grand_total
                 data.tax = tax
                 data.ip = request.META.get('REMOTE_ADDR')
+                data.payment_method = payment_method
                 data.save()
                 
                 #generate order number
@@ -62,13 +72,15 @@ def place_order(request, total=0, quantity=0):
                 data.save()
                 
                 order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number)
-                
+                payment_methods = PaymentMethod.objects.filter(is_active=True)
+
                 context = {
                     'order':order,
                     'cart_items':cart_items,
                     'total':total,
                     'tax':tax,
                     'grand_total':grand_total,
+                    'payment_method':payment_method
                     
                 }
                 return render(request, 'orders/payments.html', context)
@@ -79,6 +91,8 @@ def place_order(request, total=0, quantity=0):
         else:
             return redirect('checkout')
         
+        
+
         
 
 
