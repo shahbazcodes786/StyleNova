@@ -3,19 +3,84 @@ from django.http import HttpResponse
 from carts.models import CartItem
 from .forms import OrderForm
 import datetime
-from .models import Order, PaymentMethod
-
+from .models import Order, OrderProduct, Payment, PaymentMethod
 
 # Create your views here.
 
-def payments(request):
-    payment_method_id = request.POST.get('payment_method')
+def payments(request, order_number):
+    order = Order.objects.get(
+        order_number=order_number,
+        user=request.user,
+        is_ordered=False
+    )
+
+    cart_items = CartItem.objects.filter(user=request.user)
+
+    if request.method == 'POST':
+        transaction_id = request.POST.get('transaction_id')
+        payment_screenshot = request.FILES.get('payment_screenshot')
+        
+        payment = Payment()
+
+        payment.user = request.user
+        payment.payment_method = order.payment_method
+        payment.amount_paid = order.order_total
+        payment.transaction_id = transaction_id
+        payment.payment_screenshot = payment_screenshot
+        payment.status = 'Pending'
+
+        payment.save()
     
-    payment_method = PaymentMethod.objects.get(id=payment_method_id)
+        order.payment = payment
+        order.save()
+        
+        cart_items = CartItem.objects.filter(user=request.user)
+
+        for item in cart_items:
+
+            orderproduct = OrderProduct()
+
+            orderproduct.order = order
+            orderproduct.payment = payment
+            orderproduct.user = request.user
+            orderproduct.product = item.product
+            orderproduct.quantity = item.quantity
+            orderproduct.product_price = item.product.price
+            orderproduct.ordered = True
+
+            # Default values
+            orderproduct.color = ""
+            orderproduct.size = ""
+
+            # Get color and size
+            for variation in item.variations.all():
+
+                if variation.variation_category == "color":
+                    orderproduct.color = variation.variation_value
+
+                elif variation.variation_category == "size":
+                    orderproduct.size = variation.variation_value
+                    
+                orderproduct.variation = variation
+
+                orderproduct.save()
+
+            CartItem.objects.filter(user=request.user).delete()
+            
+            order.is_ordered = True
+            order.save()
+            
+            return redirect('home')
     
+    
+
     context = {
-        'payment_method': payment_method,
+        'order': order,
+        'payment_method': order.payment_method,
+        'grand_total': order.order_total,
+        'cart_items': cart_items,
     }
+
     return render(request, 'orders/payments.html', context)
 
 
@@ -83,7 +148,7 @@ def place_order(request, total=0, quantity=0):
                     'payment_method':payment_method
                     
                 }
-                return render(request, 'orders/payments.html', context)
+                return redirect('payments', order_number=order.order_number)
                 
             else:
                 return redirect('checkout')

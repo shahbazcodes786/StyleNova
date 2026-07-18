@@ -178,17 +178,25 @@
                     </div>
 
 
-                    <div class="form-group mt-4">
-                        <label><strong>Transaction ID <span style="color:red;">*</span></strong></label>
-                        <input type="text" class="form-control" name="transaction_id" required>
-                    </div>
+                   <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
 
-                    <div class="form-group">
-                        <label><strong>Payment Screenshot <span style="color:red;">*</span></strong></label>
-                        <input type="file" class="form-control" name="payment_screenshot" accept="image/*" required>
-                    </div>
+                        <!-- Transaction ID -->
+                        <div class="form-group mt-3">
+                            <label>Transaction ID</label>
+                            <input type="text" name="transaction_id" class="form-control" required>
+                        </div>
 
-                    <a href="{% url 'checkout' %}" class="btn btn-primary btn-block"> Make Payment </a>
+                        <!-- Payment Screenshot -->
+                        <div class="form-group mt-3">
+                            <label>Payment Screenshot</label>
+                            <input type="file" name="payment_screenshot" class="form-control" accept="image/*" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block mt-3">
+                            Make Payment
+                        </button>
+                    </form>
                 </div> <!-- card-body.// -->
                 </div> <!-- card.// -->
     
