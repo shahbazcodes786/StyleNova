@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StyleNova - Order Confirmation</title>
+
+<style>
+body{
+    margin:0;
+    padding:0;
+    background:#f4f4f4;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+.container{
+    max-width:600px;
+    margin:30px auto;
+    background:#ffffff;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+}
+
+.header{
+    background:#111827;
+    color:#fff;
+    text-align:center;
+    padding:35px 20px;
+}
+
+.header h1{
+    margin:0;
+    font-size:34px;
+    letter-spacing:1px;
+}
+
+.content{
+    padding:35px;
+    color:#444;
+    line-height:1.8;
+}
+
+.content h2{
+    color:#111827;
+    margin-top:0;
+}
+
+.order-box{
+    background:#f8f9fa;
+    border-left:5px solid #111827;
+    padding:18px;
+    margin:25px 0;
+    border-radius:8px;
+}
+
+.order-number{
+    font-size:22px;
+    font-weight:bold;
+    color:#111827;
+}
+
+.notice{
+    background:#e8f5e9;
+    border:1px solid #4caf50;
+    color:#1b5e20;
+    padding:18px;
+    border-radius:8px;
+    margin:25px 0;
+}
+
+.footer{
+    background:#111827;
+    color:#fff;
+    text-align:center;
+    padding:25px;
+    font-size:14px;
+}
+
+.footer a{
+    color:#ffffff;
+    text-decoration:none;
+}
+
+@media(max-width:600px){
+
+.content{
+padding:25px;
+}
+
+.header h1{
+font-size:28px;
+}
+
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<h1>StyleNova</h1>
+<p>Your Fashion Destination</p>
+</div>
+
+<div class="content">
+
+<h2>Thank You for Shopping with StyleNova! ❤️</h2>
+
+<p>Dear <strong>{{ user.first_name }}</strong>,</p>
+
+<p>
+We have successfully received your order and payment details.
+Thank you for choosing <strong>StyleNova</strong>.
+</p>
+
+<div class="order-box">
+
+<p><strong>Order Number</strong></p>
+
+<div class="order-number">
+#{{ order.order_number }}
+</div>
+
+</div>
+
+<div class="notice">
+
+<strong>Payment Received Successfully ✅</strong>
+
+<p>
+Your payment has been received and is currently under verification.
+</p>
+
+<p>
+Once your payment is confirmed, we will immediately begin processing your order.
+Our team will prepare your package as quickly as possible.
+</p>
+
+</div>
+
+<p>
+You will receive another email as soon as your payment is verified and your order status is updated.
+</p>
+
+<p>
+At StyleNova, we are committed to providing you with high-quality products and excellent customer service.
+</p>
+
+<p>
+<strong>In Sha Allah, we hope you will love your shopping experience with StyleNova, and we look forward to serving you again.</strong>
+</p>
+
+<p>
+If you have any questions, simply reply to this email and our support team will be happy to assist you.
+</p>
+
+<p>
+Best Regards,<br>
+<strong>StyleNova Team</strong>
+</p>
+
+</div>
+
+<div class="footer">
+
+© 2026 StyleNova. All Rights Reserved.
+
+</div>
+
+</div>
+
+</body>
+</html>

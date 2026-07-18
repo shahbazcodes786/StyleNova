@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#f5f7fb;
+    font-family:Arial, Helvetica, sans-serif;
+    color:#333;
+    padding:30px 15px;
+}
+
+.container{
+    max-width:650px;
+    margin:auto;
+    background:#fff;
+    border-radius:15px;
+    overflow:hidden;
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+
+.header{
+    background:linear-gradient(135deg,#111827,#1f2937);
+    color:#fff;
+    text-align:center;
+    padding:40px 20px;
+}
+
+.header h1{
+    font-size:36px;
+    letter-spacing:2px;
+}
+
+.header p{
+    margin-top:10px;
+    color:#d1d5db;
+    font-size:16px;
+}
+
+.content{
+    padding:40px 35px;
+}
+
+.content h2{
+    color:#111827;
+    margin-bottom:20px;
+}
+
+.content p{
+    line-height:1.8;
+    margin-bottom:18px;
+    font-size:16px;
+}
+
+.order-card{
+    background:#f9fafb;
+    border:2px dashed #2563eb;
+    border-radius:12px;
+    padding:25px;
+    text-align:center;
+    margin:30px 0;
+}
+
+.order-card small{
+    color:#666;
+    font-size:14px;
+}
+
+.order-number{
+    font-size:28px;
+    font-weight:bold;
+    color:#2563eb;
+    margin-top:10px;
+}
+
+.success-box{
+    background:#ecfdf5;
+    border-left:6px solid #10b981;
+    padding:25px;
+    border-radius:10px;
+    margin:30px 0;
+}
+
+.success-box h3{
+    color:#065f46;
+    margin-bottom:12px;
+}
+
+.timeline{
+    background:#f8fafc;
+    border-radius:10px;
+    padding:25px;
+    margin:30px 0;
+}
+
+.timeline h3{
+    margin-bottom:15px;
+    color:#111827;
+}
+
+.timeline ul{
+    padding-left:20px;
+}
+
+.timeline li{
+    margin-bottom:12px;
+    line-height:1.7;
+}
+
+.footer{
+    background:#111827;
+    color:#fff;
+    text-align:center;
+    padding:30px;
+}
+
+.footer p{
+    color:#d1d5db;
+    line-height:1.8;
+    margin:8px 0;
+}
+
+.social{
+    margin-top:20px;
+    font-size:14px;
+    color:#9ca3af;
+}
+
+@media(max-width:600px){
+
+.content{
+padding:25px;
+}
+
+.header h1{
+font-size:30px;
+}
+
+.order-number{
+font-size:22px;
+}
+
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<h1>StyleNova</h1>
+<p>Payment Successfully Verified 🎉</p>
+</div>
+
+<div class="content">
+
+<h2>Hello {{ user.first_name }}, 👋</h2>
+
+<p>
+We're excited to let you know that your payment has been
+<strong>successfully verified.</strong>
+</p>
+
+<div class="order-card">
+
+<small>Your Order Number</small>
+
+<div class="order-number">
+#{{ order.order_number }}
+</div>
+
+</div>
+
+<div class="success-box">
+
+<h3>✅ Payment Confirmed</h3>
+
+<p>
+Thank you for completing your payment.
+Our team has now started processing your order.
+</p>
+
+<p>
+Your items will be carefully prepared, packed, and dispatched as soon as possible.
+</p>
+
+</div>
+
+<div class="timeline">
+
+<h3>What happens next?</h3>
+
+<ul>
+<li>✅ Payment Verified</li>
+<li>📦 Order Processing Started</li>
+<li>🚚 Order Will Be Shipped Soon</li>
+<li>📧 You'll receive another email once your order is dispatched.</li>
+</ul>
+
+</div>
+
+<p>
+Thank you for trusting <strong>StyleNova</strong>.
+We truly appreciate your support.
+</p>
+
+<p>
+<strong>In Sha Allah, you'll love your shopping experience with us. We are committed to providing quality products and excellent customer service.</strong>
+</p>
+
+<p>
+If you have any questions, simply reply to this email and we'll be happy to help.
+</p>
+
+<p style="margin-top:35px;">
+Warm Regards,<br>
+<b>StyleNova Team ❤️</b>
+</p>
+
+</div>
+
+<div class="footer">
+
+<h2 style="margin-bottom:10px;">Thank You ❤️</h2>
+
+<p>
+Your style is our passion.
+</p>
+
+<p>
+© 2026 StyleNova. All Rights Reserved.
+</p>
+
+<div class="social">
+Follow us for new arrivals and exclusive offers.
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>

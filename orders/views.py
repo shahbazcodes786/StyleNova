@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from carts.models import CartItem
+from store.models import Product
 from .forms import OrderForm
 import datetime
 from .models import Order, OrderProduct, Payment, PaymentMethod
+from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
 
 # Create your views here.
 
@@ -39,38 +42,48 @@ def payments(request, order_number):
         for item in cart_items:
 
             orderproduct = OrderProduct()
-
-            orderproduct.order = order
+            orderproduct.order_id = order.id
             orderproduct.payment = payment
-            orderproduct.user = request.user
-            orderproduct.product = item.product
+            orderproduct.user_id = request.user.id
+            orderproduct.product_id = item.product.id
             orderproduct.quantity = item.quantity
             orderproduct.product_price = item.product.price
             orderproduct.ordered = True
+            orderproduct.save()
 
-            # Default values
-            orderproduct.color = ""
-            orderproduct.size = ""
-
-            # Get color and size
-            for variation in item.variations.all():
-
-                if variation.variation_category == "color":
-                    orderproduct.color = variation.variation_value
-
-                elif variation.variation_category == "size":
-                    orderproduct.size = variation.variation_value
-                    
-                orderproduct.variation = variation
-
-                orderproduct.save()
-
-            CartItem.objects.filter(user=request.user).delete()
             
-            order.is_ordered = True
-            order.save()
+            cart_item = CartItem.objects.get(id=item.id)
+            product_variation = cart_item.variations.all()
+
+            orderproduct.variations.set(product_variation)
             
-            return redirect('home')
+            
+            #reduce the quantity of the sold products
+            product = Product.objects.get(id=item.product_id)
+            product.stock -= item.quantity
+            product.save()
+
+        #clear the cart item
+        CartItem.objects.filter(user=request.user).delete()
+        
+        order.is_ordered = True
+        order.save()
+        
+        
+        
+        
+        #send order received email to customer
+        mail_subject = 'Thank you for your order!'
+        message = render_to_string('orders/order_received_email.html', {
+            'user': request.user,
+            'order': order,
+        })
+        to_email = request.user.email
+        send_email = EmailMessage(mail_subject, message, to=[to_email])
+        send_email.content_subtype = "html"
+        send_email.send()
+
+        return redirect('home')
     
     
 
@@ -137,7 +150,6 @@ def place_order(request, total=0, quantity=0):
                 data.save()
                 
                 order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number)
-                payment_methods = PaymentMethod.objects.filter(is_active=True)
 
                 context = {
                     'order':order,
