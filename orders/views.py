@@ -7,6 +7,8 @@ import datetime
 from .models import Order, OrderProduct, Payment, PaymentMethod
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 
@@ -30,7 +32,7 @@ def payments(request, order_number):
         payment.amount_paid = order.order_total
         payment.transaction_id = transaction_id
         payment.payment_screenshot = payment_screenshot
-        payment.status = 'Pending'
+        payment.status = 'pending'
 
         payment.save()
     
@@ -53,15 +55,27 @@ def payments(request, order_number):
 
             
             cart_item = CartItem.objects.get(id=item.id)
+            
             product_variation = cart_item.variations.all()
 
+            for variation in product_variation:
+
+                if variation.variation_category.lower() == 'color':
+                    orderproduct.color = variation.variation_value
+
+                elif variation.variation_category.lower() == 'size':
+                    orderproduct.size = variation.variation_value
+
+            orderproduct.save()
+
             orderproduct.variations.set(product_variation)
-            
+                        
             
             #reduce the quantity of the sold products
             product = Product.objects.get(id=item.product_id)
-            product.stock -= item.quantity
-            product.save()
+            if product.stock >= item.quantity:
+                product.stock -= item.quantity
+                product.save()
 
         #clear the cart item
         CartItem.objects.filter(user=request.user).delete()
@@ -83,7 +97,7 @@ def payments(request, order_number):
         send_email.content_subtype = "html"
         send_email.send()
 
-        return redirect('home')
+        return redirect('order_complete', order_number=order.order_number)
     
     
 
@@ -167,6 +181,22 @@ def place_order(request, total=0, quantity=0):
             
         else:
             return redirect('checkout')
+        
+        
+        
+@login_required
+def order_complete(request, order_number):
+
+    order = get_object_or_404(Order, order_number=order_number, user=request.user, is_ordered=True)
+    ordered_products = OrderProduct.objects.filter(order=order)
+
+    context = {
+        'order': order,
+        'ordered_products': ordered_products,
+        'payment': order.payment,
+    }
+
+    return render(request, 'orders/order_complete.html', context)
         
         
 

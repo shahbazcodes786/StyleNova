@@ -16,6 +16,9 @@ from carts.views import _cart_id, Cart, CartItem
 
 import requests
 
+from orders.models import Order, Payment
+from django.db.models import Sum
+
 # Create your views here.
 
 

@@ -11,13 +11,21 @@ class Payment(models.Model):
     amount_paid = models.CharField(max_length=100)
     transaction_id = models.CharField(max_length=100)
     payment_screenshot = models.ImageField(upload_to='payment_screenshots/' )
-    status = models.CharField(max_length=20,
-        choices=(
-            ('Pending', 'Pending'),
-            ('Verified', 'Verified'),
-            ('Rejected', 'Rejected'),
-        ),
-        default='Pending')
+    PAYMENT_STATUS = (
+    ('pending', 'Pending'),
+    ('verified', 'Verified'),
+    ('rejected', 'Rejected'),
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=PAYMENT_STATUS,
+        default='pending'
+    )
+
+    rejection_reason = models.TextField(
+        blank=True,
+        null=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     
     
@@ -28,13 +36,15 @@ class Payment(models.Model):
     
 #in Order model we store the information about the customer
 class Order(models.Model):
-    STATUS = (
-        ('New', 'New'),
-        ('Accepted', "Accepted"),
-        ('Completed', 'Completed'),
-        ('Cancelled', 'Cancelled'),
-        
-    )
+    ORDER_STATUS = (
+    ('awaiting', 'Awaiting Confirmation'),
+    ('processing', 'Processing'),
+    ('packed', 'Packed'),
+    ('shipped', 'Shipped'),
+    ('out_for_delivery', 'Out For Delivery'),
+    ('delivered', 'Delivered'),
+    ('cancelled', 'Cancelled'),
+)
     
     user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True)
@@ -51,10 +61,12 @@ class Order(models.Model):
     order_note = models.CharField(max_length=150, blank=True)
     order_total = models.FloatField()
     tax = models.FloatField()
-    status = models.CharField(max_length=50, choices=STATUS, default='New')
+    status = models.CharField(max_length=50, choices=ORDER_STATUS, default='awaiting')
+    tracking_number = models.CharField(max_length=100, blank=True, null=True)
     ip = models.CharField(max_length=50, blank=True)
     payment_method = models.ForeignKey("PaymentMethod", on_delete=models.SET_NULL, blank=True, null=True)
     is_ordered = models.BooleanField(default=False)
+    estimated_delivery = models.DateField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -78,8 +90,8 @@ class OrderProduct(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     variations = models.ManyToManyField(Variation, blank=True)
-    color = models.CharField(max_length=50)
-    size = models.CharField(max_length=50)
+    color = models.CharField(max_length=50, blank=True)
+    size = models.CharField(max_length=50, blank=True)
     quantity = models.IntegerField()
     product_price = models.FloatField()
     ordered = models.BooleanField(default=False)
