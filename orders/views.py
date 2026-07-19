@@ -10,6 +10,7 @@ from django.core.mail import EmailMessage
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 
+
 # Create your views here.
 
 def payments(request, order_number):
@@ -203,3 +204,39 @@ def order_complete(request, order_number):
         
 
 
+
+@login_required(login_url='login')
+def my_orders(request):
+
+    orders = Order.objects.filter(
+        user=request.user,
+        is_ordered=True
+    ).order_by('-created_at')
+
+    context = {
+        'orders': orders,
+    }
+
+    return render(request, 'orders/my_orders.html', context)
+
+
+
+@login_required(login_url='login')
+def order_detail(request, order_number):
+
+    order = get_object_or_404(
+        Order,
+        order_number=order_number,
+        user=request.user,
+        is_ordered=True
+    )
+
+    ordered_products = OrderProduct.objects.filter(order=order)
+
+    context = {
+        'order': order,
+        'ordered_products': ordered_products,
+        'payment': order.payment,
+    }
+
+    return render(request, 'orders/order_detail.html', context)

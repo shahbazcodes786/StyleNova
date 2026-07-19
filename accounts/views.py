@@ -154,7 +154,38 @@ def activate(request, uidb64, token):
 
 @login_required(login_url='login')
 def dashboard(request):
-    return render(request, 'accounts/dashboard.html')
+
+    orders = Order.objects.filter(
+        user=request.user,
+        is_ordered=True
+    ).order_by('-created_at')
+
+    total_orders = orders.count()
+
+    active_orders = orders.exclude(
+        status__in=['delivered', 'cancelled']
+    ).count()
+
+    pending_payments = Payment.objects.filter(
+        user=request.user,
+        status='pending'
+    ).count()
+
+    total_spending = orders.aggregate(
+        total=Sum('order_total')
+    )['total'] or 0
+
+    recent_orders = orders[:5]
+
+    context = {
+        'total_orders': total_orders,
+        'active_orders': active_orders,
+        'pending_payments': pending_payments,
+        'total_spending': total_spending,
+        'recent_orders': recent_orders,
+    }
+
+    return render(request, 'accounts/dashboard.html', context)
 
 
 

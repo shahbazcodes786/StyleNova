@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Orders{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <h2 class="mb-4">
+        My Orders
+    </h2>
+
+    {% if orders %}
+
+    <table class="table table-bordered">
+
+        <thead>
+
+            <tr>
+
+                <th>Order Number</th>
+
+                <th>Date</th>
+
+                <th>Payment</th>
+
+                <th>Order Status</th>
+
+                <th>Total</th>
+
+                <th></th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for order in orders %}
+
+        <tr>
+
+            <td>#{{ order.order_number }}</td>
+
+            <td>{{ order.created_at|date:"d M Y" }}</td>
+
+            <td>{{ order.payment.get_status_display }}</td>
+
+            <td>{{ order.get_status_display }}</td>
+
+            <td>Rs {{ order.order_total }}</td>
+
+            <td>
+
+                <a href="{% url 'order_detail' order.order_number %}"
+                   class="btn btn-primary btn-sm">
+
+                    View
+
+                </a>
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% else %}
+
+    <div class="alert alert-info">
+
+        You haven't placed any orders yet.
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
