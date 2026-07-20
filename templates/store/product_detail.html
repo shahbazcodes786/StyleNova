@@ -71,6 +71,47 @@
     
     <br>
     
+    {% comment "" %}
+    Review form
+    {% endcomment %}
+
+    <h4 class="mt-5">Write Your Review</h4>
+
+<form action="{% url 'submit_review' single_product.id %}" method="POST">
+
+    {% csrf_token %}
+
+    <div class="form-group">
+        <label>Review Title</label>
+        {{ review_form.subject }}
+    </div>
+
+    <div class="form-group mt-3">
+        <label>Your Review</label>
+        {{ review_form.review }}
+    </div>
+
+    <div class="form-group mt-3">
+
+        <label>Rating</label>
+
+        <br>
+
+        <input type="radio" name="rating" value="1"> ⭐
+        <input type="radio" name="rating" value="2"> ⭐⭐
+        <input type="radio" name="rating" value="3"> ⭐⭐⭐
+        <input type="radio" name="rating" value="4"> ⭐⭐⭐⭐
+        <input type="radio" name="rating" value="5" checked> ⭐⭐⭐⭐⭐
+
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">
+        Submit Review
+    </button>
+
+</form>
+
+
     <div class="row">
                 <div class="col-md-9">
     
@@ -79,23 +120,70 @@
             
         </header>
     
-        <article class="box mb-3">
-            <div class="icontext w-100">
-                <img src="{% static './images/avatars/avatar1.jpg' %}" class="img-xs icon rounded-circle">
-                <div class="text">
-                    <span class="date text-muted float-md-right">24.04.2020 </span>  
-                    <h6 class="mb-1">Mike John </h6>
-                    
+
+
+        {% if reviews %}
+
+            {% for review in reviews %}
+
+            <article class="box mb-3">
+
+                <div class="icontext w-100">
+
+                    <div class="text">
+
+                        <span class="date text-muted float-md-right">
+                            {{ review.created_at|date:"d M, Y" }}
+                        </span>
+
+                        <h6 class="mb-1">
+                            {{ review.user.first_name }} {{ review.user.last_name }}
+
+                            {% if review.is_verified_purchase %}
+                                <span class="badge bg-success">
+                                    Verified Purchase
+                                </span>
+                            {% endif %}
+                        </h6>
+
+                    </div>
+
                 </div>
-            </div> <!-- icontext.// -->
-            <div class="mt-3">
-                <p>
-                    Dummy comment Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                    quis nostrud exercitation ullamco laboris nisi ut aliquip
-                </p>	
+
+                <div class="mt-2">
+
+                    <strong>{{ review.subject }}</strong>
+
+                    <br>
+
+                    {% for i in "12345" %}
+
+                        {% if forloop.counter <= review.rating %}
+                            ⭐
+                        {% else %}
+                            ☆
+                        {% endif %}
+
+                    {% endfor %}
+
+                    <p class="mt-2">
+                        {{ review.review }}
+                    </p>
+
+                </div>
+
+            </article>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="alert alert-info">
+                No reviews yet. Be the first to review this product.
             </div>
-        </article>
+
+        {% endif %}
+        
     
         
     

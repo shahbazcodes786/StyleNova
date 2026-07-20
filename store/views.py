@@ -1,11 +1,17 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Product
+from django.shortcuts import render, get_object_or_404, redirect
+from urllib3 import request
+from .models import Product, ReviewRating
 from category.models import Category
 from carts.views import _cart_id
 from carts.models import CartItem
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Q
 from django.http import HttpResponse
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .forms import ReviewForm
+from orders.models import OrderProduct
+
 # Create your views here.
 def store(request, category_slug = None):
     categories = None
@@ -37,9 +43,15 @@ def product_detail(request, category_slug, product_slug):
     except Exception as e:
         raise e
     
+    
+    
+    #product reviews
+    reviews = ReviewRating.objects.filter( product=single_product, is_approved=True).order_by('-created_at')    
     context = {
         'single_product': single_product,
         'in_cart': in_cart,
+        'reviews': reviews,
+        "review_form": ReviewForm()
     }
     return render(request, 'store/product_detail.html', context)
 
@@ -56,3 +68,35 @@ def search(request):
 
     }
     return render(request, 'store/store.html', context)
+
+
+@login_required(login_url='login')
+def submit_review(request, product_id):
+
+    url = request.META.get('HTTP_REFERER')
+
+    if request.method == 'POST':
+
+        product = get_object_or_404(Product, id=product_id)
+
+        # Check purchased product
+        has_purchased = OrderProduct.objects.filter(user=request.user, product=product, ordered=True).exists()
+        
+
+        form = ReviewForm(request.POST)
+
+        if form.is_valid():
+
+            review = form.save(commit=False)
+
+            review.user = request.user
+            review.product = product
+            review.rating = request.POST.get('rating')
+            review.ip = request.META.get('REMOTE_ADDR')
+            review.is_verified_purchase = has_purchased
+
+            review.save()
+
+            messages.success(request, "Thank you! Your review has been submitted.")
+
+    return redirect(url)
