@@ -13,6 +13,7 @@ class Product(models.Model):
     stock           = models.IntegerField()
     is_available    = models.BooleanField(default=True)
     category        = models.ForeignKey(Category, on_delete=models.CASCADE)
+    variation_categories = models.ManyToManyField("VariationCategory", blank=True, related_name='products')
     created_date    = models.DateTimeField(auto_now_add=True)
     modified_date   = models.DateTimeField(auto_now=True)
 
@@ -23,32 +24,51 @@ class Product(models.Model):
         return self.product_name
 
 
-class VariationManager(models.Manager):
-    def colors(self):
-        return super(VariationManager, self).filter(variation_category='color', is_active=True)
-
-    def sizes(self):
-        return super(VariationManager, self).filter(variation_category='size', is_active=True)
 
 
 
-variation_category_choice = (
-    ('color', 'color'),
-    ('size', 'size'),
-)
 
 
-class Variation(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    variation_category = models.CharField(max_length=100, choices=variation_category_choice)
-    variation_value = models.CharField(max_length=100)
-    is_active = models.BooleanField(default=True)
-    created_date = models.DateTimeField(auto_now_add=True)
 
-    objects = VariationManager()
+
+class VariationCategory(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        verbose_name = 'Variation Category'
+        verbose_name_plural = 'Variation Categories'
+        ordering = ['name']
 
     def __str__(self):
-        return self.variation_value
+        return self.name
+    
+    
+class Variation(models.Model):
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name="variations"
+    )
+
+    variation_category = models.ForeignKey(
+    VariationCategory,
+    on_delete=models.CASCADE,
+    null=True,
+    blank=True,
+    related_name="variation_items"
+)
+
+    variation_value = models.CharField(max_length=100)
+
+    is_active = models.BooleanField(default=True)
+
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("product", "variation_category", "variation_value")
+
+    def __str__(self):
+        return f"{self.variation_category.name}: {self.variation_value}"
     
     
     

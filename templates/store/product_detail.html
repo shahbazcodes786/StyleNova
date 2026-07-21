@@ -31,27 +31,38 @@
       <p>{{ single_product.description }}</p>
       
       
-      <hr>
+      <hr class="my-5">
           <div class="row">
               <div class="item-option-select">
-                  <h6>Choose Color</h6>
-                  <select name="color" class="form-control" required>
-                    <option value="" disabled selected>Select</option>
-                    {% for i in single_product.variation_set.colors %}
-                    <option value="{{ i.variation_value | lower }}">{{ i.variation_value | capfirst }}</option>   
-                    {% endfor %}
-                  </select>
-              </div>
-          </div> <!-- row.// -->
-          <div class="row">
-              <div class="item-option-select">
-                  <h6>Select Size</h6>
-                  <select name="size" class="form-control" required>
-                    <option value="" disabled selected>Select</option>
-                    {% for i in single_product.variation_set.sizes %}
-                    <option value="{{ i.variation_value | lower }}">{{ i.variation_value | capfirst }}</option>   
-                    {% endfor %}
-                  </select>
+                {% for category in variation_categories %}
+
+                <div class="mb-3">
+
+                    <label>{{ category.name }}</label>
+
+                    <select name="variation_{{ category.id }}" class="form-control">
+
+                        <option value="">Select {{ category.name }}</option>
+
+                        {% for variation in single_product.variations.all %}
+
+                            {% if variation.variation_category == category %}
+
+                                <option value="{{ variation.id }}">
+                                    {{ variation.variation_value }}
+                                </option>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                {% endfor %}
+
+
               </div>
           </div> <!-- row.// -->
           <hr>
@@ -74,6 +85,8 @@
     {% comment "" %}
     Review form
     {% endcomment %}
+    <div class="card shadow-sm">
+        <div class="card-body">
 
     <h4 class="mt-5">Write Your Review</h4>
 
@@ -111,12 +124,17 @@
 
 </form>
 
+<hr class="my-5">
 
+</div>
+    </div>
     <div class="row">
                 <div class="col-md-9">
     
         <header class="section-heading">
-            <h3>Customer Reviews </h3>  
+            <h3 class="mb-4">
+                Customer Reviews
+            </h3>  
             
         </header>
     

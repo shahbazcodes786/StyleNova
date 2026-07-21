@@ -44,12 +44,14 @@ def product_detail(request, category_slug, product_slug):
         raise e
     
     
-    
+    #product variations
+    variation_categories = single_product.variation_categories.all()
     #product reviews
     reviews = ReviewRating.objects.filter( product=single_product, is_approved=True).order_by('-created_at')    
     context = {
         'single_product': single_product,
         'in_cart': in_cart,
+        'variation_categories': variation_categories,
         'reviews': reviews,
         "review_form": ReviewForm()
     }
