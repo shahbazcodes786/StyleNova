@@ -39,6 +39,6 @@ class VariationAdminForm(forms.ModelForm):
                 self.instance.product.variation_categories.all()
             )
         else:
-            self.fields["variation_category"].queryset = self.fields[
-                "variation_category"
-            ].queryset.none()
+            # Naye Product ke liye sab categories dikhao
+            from .models import VariationCategory
+            self.fields["variation_category"].queryset = VariationCategory.objects.all()

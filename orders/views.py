@@ -57,20 +57,12 @@ def payments(request, order_number):
             
             cart_item = CartItem.objects.get(id=item.id)
             
+            
             product_variation = cart_item.variations.all()
 
-            for variation in product_variation:
-
-                if variation.variation_category.lower() == 'color':
-                    orderproduct.color = variation.variation_value
-
-                elif variation.variation_category.lower() == 'size':
-                    orderproduct.size = variation.variation_value
-
             orderproduct.save()
-
             orderproduct.variations.set(product_variation)
-                        
+                                    
             
             #reduce the quantity of the sold products
             product = Product.objects.get(id=item.product_id)

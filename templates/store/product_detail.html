@@ -38,22 +38,18 @@
 
                 <div class="mb-3">
 
-                    <label>{{ category.name }}</label>
+                    <h6>Select {{ category.name }}</h6>
 
-                    <select name="variation_{{ category.id }}" class="form-control">
+                    <select name="{{ category.name|lower }}" class="form-control">
 
                         <option value="">Select {{ category.name }}</option>
 
                         {% for variation in single_product.variations.all %}
-
                             {% if variation.variation_category == category %}
-
-                                <option value="{{ variation.id }}">
+                                <option value="{{ variation.variation_value }}">
                                     {{ variation.variation_value }}
                                 </option>
-
                             {% endif %}
-
                         {% endfor %}
 
                     </select>
@@ -90,8 +86,7 @@
 
     <h4 class="mt-5">Write Your Review</h4>
 
-<form action="{% url 'submit_review' single_product.id %}" method="POST">
-
+<form action="{% url 'submit_review' single_product.id %}" method="POST">y
     {% csrf_token %}
 
     <div class="form-group">

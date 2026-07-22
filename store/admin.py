@@ -20,13 +20,21 @@ class ProductAdmin(admin.ModelAdmin):
         'is_available',
     )
 
+    inlines = [VariationInline]
+
+    class Media:
+        js = (
+            'js/product_variation.js',
+        )
+        
+        
     prepopulated_fields = {
         'slug': ('product_name',)
     }
 
     filter_horizontal = ('variation_categories',)
 
-    inlines = [VariationInline]
+    search_fields = ('product_name', 'description', 'category__category_name')
 
 
 @admin.register(Variation)
