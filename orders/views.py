@@ -9,6 +9,12 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+import os
+from django.conf import settings
 
 
 # Create your views here.
@@ -182,11 +188,13 @@ def order_complete(request, order_number):
 
     order = get_object_or_404(Order, order_number=order_number, user=request.user, is_ordered=True)
     ordered_products = OrderProduct.objects.filter(order=order)
+    cart_items = CartItem.objects.filter(user=request.user)
 
     context = {
         'order': order,
         'ordered_products': ordered_products,
         'payment': order.payment,
+        
     }
 
     return render(request, 'orders/order_complete.html', context)
@@ -232,3 +240,58 @@ def order_detail(request, order_number):
     }
 
     return render(request, 'orders/order_detail.html', context)
+
+
+def link_callback(uri, rel):
+
+    if uri.startswith(settings.MEDIA_URL):
+        path = os.path.join(settings.MEDIA_ROOT, uri.replace(settings.MEDIA_URL, ""))
+
+    elif uri.startswith(settings.STATIC_URL):
+        path = os.path.join(settings.STATIC_ROOT, uri.replace(settings.STATIC_URL, ""))
+
+        if not os.path.exists(path):
+            path = os.path.join(settings.BASE_DIR, "static", uri.replace(settings.STATIC_URL, ""))
+
+    else:
+        return uri
+
+    return path
+
+
+@login_required(login_url='login')
+def invoice(request, order_number):
+
+    order = get_object_or_404(
+        Order,
+        order_number=order_number,
+        user=request.user,
+        is_ordered=True
+    )
+
+    ordered_products = OrderProduct.objects.filter(order=order)
+
+    template = get_template('orders/invoice.html')
+
+    context = {
+        'order': order,
+        'ordered_products': ordered_products,
+        'payment': order.payment,
+    }
+
+    html = template.render(context)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Invoice-{order.order_number}.pdf"'
+
+    pisa_status = pisa.CreatePDF(
+    html,
+    dest=response,
+    link_callback=link_callback
+)
+    
+
+    if pisa_status.err:
+        return HttpResponse("Error generating invoice")
+
+    return response

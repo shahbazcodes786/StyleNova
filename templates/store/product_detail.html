@@ -86,7 +86,7 @@
 
     <h4 class="mt-5">Write Your Review</h4>
 
-<form action="{% url 'submit_review' single_product.id %}" method="POST">y
+<form action="{% url 'submit_review' single_product.id %}" method="POST">
     {% csrf_token %}
 
     <div class="form-group">

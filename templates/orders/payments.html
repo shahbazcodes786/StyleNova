@@ -59,7 +59,8 @@
                                                 
                                                 {% if cart_item.variations.all %}
                                                     {% for item in cart_item.variations.all %}
-                                                        {{ item.variation_category | capfirst }} : {{ item.variation_value | capfirst }} <br>
+                                                    <strong>   {{ item.variation_category | capfirst }}:</strong>
+                                                       {{ item.variation_value | capfirst }} <br>
                                                     {% endfor %}
                                                 {% endif %}
                                                     
