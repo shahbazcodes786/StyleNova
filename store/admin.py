@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Product, ReviewRating, Variation, VariationCategory
-from .forms import VariationAdminForm
+from .forms import VariationAdminForm, ProductAdminForm
 
 
 class VariationInline(admin.TabularInline):
@@ -11,6 +11,10 @@ class VariationInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    
+    form = ProductAdminForm
+    
+    
     list_display = (
         'product_name',
         'price',
@@ -25,6 +29,7 @@ class ProductAdmin(admin.ModelAdmin):
     class Media:
         js = (
             'js/product_variation.js',
+            'js/product_discount.js',
         )
         
         
@@ -35,6 +40,8 @@ class ProductAdmin(admin.ModelAdmin):
     filter_horizontal = ('variation_categories',)
 
     search_fields = ('product_name', 'description', 'category__category_name')
+    
+
 
 
 @admin.register(Variation)

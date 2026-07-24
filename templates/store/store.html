@@ -144,7 +144,29 @@
                         <div class="fix-height">
                             <a href="{{ product.get_url }}" class="title">{{ product.product_name }}</a>
                             <div class="price-wrap mt-2">
-                                <span class="price">{{ product.price }}</span>
+                                {% if product.discount_amount > 0 %}
+
+                                    <span class="price text-success fw-bold">
+                                        Rs {{ product.selling_price|floatformat:2 }}
+                                    </span>
+
+                                    <br>
+
+                                    <small class="text-muted text-decoration-line-through">
+                                        Rs {{ product.price|floatformat:2 }}
+                                    </small>
+
+                                    <span class="badge bg-danger">
+                                        {{ product.discount_percentage|floatformat:0 }}% OFF
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="price">
+                                        Rs {{ product.price|floatformat:2 }}
+                                    </span>
+
+                                {% endif %}
                             </div> <!-- price-wrap.// -->
                         </div>
                         <a href="{{product.get_url}}" class="btn btn-block btn-primary">View Details </a>	

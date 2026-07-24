@@ -24,9 +24,33 @@
       
       <h2 class="title">{{ single_product.product_name }}</h2>
       
-      <div class="mb-3"> 
-          <var class="price h4">Rs{{ single_product.price }}</var> 
-      </div> 
+      <div class="mb-3">
+
+        {% if single_product.discount_amount > 0 %}
+
+            <span class="h3 text-success fw-bold">
+                Rs {{ single_product.selling_price }}
+            </span>
+
+            <br>
+
+            <span class="text-muted text-decoration-line-through">
+                Rs {{ single_product.price }}
+            </span>
+
+            <span class="badge bg-danger ms-2">
+                {{ single_product.discount_percentage|floatformat:0 }}% OFF
+            </span>
+
+        {% else %}
+
+            <span class="h3 fw-bold">
+                Rs {{ single_product.price }}
+            </span>
+
+        {% endif %}
+
+    </div>
       
       <p>{{ single_product.description }}</p>
       

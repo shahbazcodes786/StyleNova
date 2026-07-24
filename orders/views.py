@@ -56,7 +56,7 @@ def payments(request, order_number):
             orderproduct.user_id = request.user.id
             orderproduct.product_id = item.product.id
             orderproduct.quantity = item.quantity
-            orderproduct.product_price = item.product.price
+            orderproduct.product_price = item.product.selling_price
             orderproduct.ordered = True
             orderproduct.save()
 
@@ -98,12 +98,22 @@ def payments(request, order_number):
 
         return redirect('order_complete', order_number=order.order_number)
     
+    total = 0
+
+    for cart_item in cart_items:
+        total += cart_item.product.selling_price * cart_item.quantity
+
+    tax = (2 * total) / 100
+    total = total - tax
+        
     
 
     context = {
         'order': order,
         'payment_method': order.payment_method,
         'grand_total': order.order_total,
+        "tax": tax,
+        "total": total,
         'cart_items': cart_items,
     }
 
@@ -123,7 +133,7 @@ def place_order(request, total=0, quantity=0):
         tax = 0
         
         for cart_item in cart_items:
-            total += (cart_item.product.price * cart_item.quantity)
+            total += (cart_item.product.selling_price * cart_item.quantity)
             quantity += cart_item.quantity
         tax = (2 * total)/100
         grand_total = total + tax
